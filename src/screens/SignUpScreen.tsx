@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
+
 const signUpSchema = z.object({
   firstName: z.string().min(1, 'First Name is required'),
   lastName: z.string().min(1, 'Last Name is required'),
@@ -14,8 +15,8 @@ const signUpSchema = z.object({
 type SignUpFormData = z.infer<typeof signUpSchema>;
 
 const SignUpScreen = () => {
-    const [isLoading, setIsLoading] = useState(false);
-    const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
   const [successMessage, setSuccessMessage] = useState('');
 
   const { control, handleSubmit, formState: { errors } } = useForm<SignUpFormData>({
@@ -28,12 +29,8 @@ const SignUpScreen = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // If successful, show success message
       //@ts-ignore
       navigation.navigate('SignUpConfirmation');
-      
-      // Reset form (you might want to implement this differently in React Native)
-      // For now, we'll just log the data
       console.log('Form data:', data);
     } catch (error) {
       console.error('Sign up error:', error);
@@ -136,6 +133,14 @@ const SignUpScreen = () => {
           )}
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity
+        style={styles.signInLink}
+        //@ts-ignore
+        onPress={() => navigation.navigate('SignIn')}
+      >
+        <Text style={styles.signInText}>Already have an account? Sign In</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -194,6 +199,14 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     fontWeight: '600',
+  },
+
+  signInLink: {
+    marginTop: 16,
+  },
+  signInText: {
+    color: 'blue',
+    textAlign: 'center',
   },
 });
 

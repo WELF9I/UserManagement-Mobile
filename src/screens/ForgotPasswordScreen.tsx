@@ -3,6 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator,
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
+import { useNavigation } from '@react-navigation/native';
+import { useAttempt } from '../components/AttemptContext';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Email is invalid'),
@@ -14,23 +16,35 @@ const ForgotPasswordScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
+  const navigation = useNavigation();
+  const { resetAttempts, resetBlockUntil, decrementResetAttempts } = useAttempt();
 
   const { control, handleSubmit, formState: { errors } } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
+    if (resetBlockUntil && Date.now() < resetBlockUntil) {
+      const minutesLeft = Math.ceil((resetBlockUntil - Date.now()) / (1000 * 60));
+      setSubmitError(`Please wait ${minutesLeft} minutes before requesting another code.`);
+      return;
+    }
+
     setIsLoading(true);
     setSubmitError('');
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // If successful, show success message
-      setSuccessMessage('Password reset link sent to your email. Please check your inbox.');
+      await decrementResetAttempts();
       
-      // You might want to navigate to another screen or update the app state here
-      console.log('Forgot password data:', data);
+      setSuccessMessage('A reset code has been sent to your email.');
+      
+      // Navigate to Code Verification screen after a short delay
+      setTimeout(() => {
+        //@ts-ignore
+        navigation.navigate('CodeVerification', { email: data.email });
+      }, 2000);
     } catch (error) {
       console.error('Forgot password error:', error);
       setSubmitError('An error occurred. Please try again.');
@@ -78,19 +92,23 @@ const ForgotPasswordScreen = () => {
         <TouchableOpacity
           style={styles.button}
           onPress={handleSubmit(onSubmit)}
-          disabled={isLoading}
+          //@ts-ignore
+          disabled={isLoading || (resetBlockUntil && Date.now() < resetBlockUntil)}
         >
           {isLoading ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text style={styles.buttonText}>Send Reset Link</Text>
+            <Text style={styles.buttonText}>Send Reset Code</Text>
           )}
         </TouchableOpacity>
+
+        <Text style={styles.attemptsText}>
+          Reset attempts left: {Math.max(resetAttempts, 0)}
+        </Text>
       </View>
     </ScrollView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -157,6 +175,11 @@ const styles = StyleSheet.create({
   },
   errorMessageText: {
     color: '#721c24',
+  },
+  attemptsText: {
+    textAlign: 'center',
+    marginTop: 10,
+    color: 'gray',
   },
 });
 

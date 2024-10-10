@@ -116,6 +116,14 @@ const SignInScreen = () => {
       >
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.signUpLink}
+        //@ts-ignore
+        onPress={() => navigation.navigate('SignUp')}
+      >
+        <Text style={styles.signUpText}>Don't have an account? Sign Up</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -191,6 +199,13 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   forgotPasswordText: {
+    color: 'blue',
+    textAlign: 'center',
+  },
+  signUpLink: {
+    marginTop: 16,
+  },
+  signUpText: {
     color: 'blue',
     textAlign: 'center',
   },
