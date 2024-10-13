@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAttempt } from '../components/AttemptContext';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../components/ThemeContext';
+import CustomHeader from '../components/CustomHeader';
 
 const CodeVerificationScreen = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
@@ -11,6 +14,8 @@ const CodeVerificationScreen = () => {
   const route = useRoute();
   const { email } = route.params as { email: string };
   const { verifyAttempts, verifyBlockUntil, resetAttempts, resetBlockUntil, decrementVerifyAttempts, decrementResetAttempts } = useAttempt();
+  const { t } = useTranslation();
+  const { theme } = useTheme();
 
   const FIXED_CODE = '123456';
 
@@ -42,7 +47,7 @@ const CodeVerificationScreen = () => {
   const handleResetPassword = async () => {
     if (verifyBlockUntil && Date.now() < verifyBlockUntil) {
       const minutesLeft = Math.ceil((verifyBlockUntil - Date.now()) / (1000 * 60));
-      Alert.alert('Error', `Please try again in ${minutesLeft} minutes.`);
+      Alert.alert(t('error'), t('tryAgainInMinutes', { minutes: minutesLeft }));
       return;
     }
 
@@ -56,9 +61,9 @@ const CodeVerificationScreen = () => {
     } else {
       await decrementVerifyAttempts();
       if (verifyAttempts <= 1) {
-        Alert.alert('Error', 'You have exceeded the maximum attempts. Please try again in 1 hour.');
+        Alert.alert(t('error'), t('exceededMaxAttempts'));
       } else {
-        Alert.alert('Error', `Invalid code. Verify attempts left: ${verifyAttempts - 1}`);
+        Alert.alert(t('error'), t('invalidCodeAttemptsLeft', { attempts: verifyAttempts - 1 }));
       }
     }
   };
@@ -66,22 +71,23 @@ const CodeVerificationScreen = () => {
   const handleResendCode = async () => {
     if (resetBlockUntil && Date.now() < resetBlockUntil) {
       const minutesLeft = Math.ceil((resetBlockUntil - Date.now()) / (1000 * 60));
-      Alert.alert('Error', `Please wait ${minutesLeft} minutes before requesting another code.`);
+      Alert.alert(t('error'), t('waitBeforeRequestingCode', { minutes: minutesLeft }));
       return;
     }
 
     if (resetAttempts <= 0) {
-      Alert.alert('Error', 'You have exceeded the maximum resend attempts. Please try again in 1 hour.');
+      Alert.alert(t('error'), t('exceededMaxResendAttempts'));
     } else {
       await decrementResetAttempts();
-      Alert.alert('Success', 'A new verification code has been sent to your email.');
+      Alert.alert(t('success'), t('newCodeSent'));
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Enter Verification Code</Text>
-      <Text style={styles.subtitle}>We've sent a 6-digit code to {email}</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <CustomHeader title={t('verificationCode')} />
+      <Text style={[styles.title, { color: theme.foreground }]}>{t('enterVerificationCode')}</Text>
+      <Text style={[styles.subtitle, { color: theme.mutedForeground }]}>{t('codeSentTo', { email })}</Text>
       
       <View style={styles.codeContainer}>
         {code.map((digit, index) => (
@@ -89,6 +95,7 @@ const CodeVerificationScreen = () => {
             key={index}
             style={[
               styles.codeInput,
+              { borderColor: theme.border, color: theme.foreground },
               isValid === false && styles.invalidInput,
               isValid === true && styles.validInput
             ]}
@@ -104,33 +111,38 @@ const CodeVerificationScreen = () => {
       </View>
 
       {isValid === false && (
-        <Text style={styles.errorMessage}>
-          Invalid code. Verify attempts left: {verifyAttempts}
-          {verifyBlockUntil && Date.now() < verifyBlockUntil && ". Please try again in 1 hour."}
+        <Text style={[styles.errorMessage, { color: theme.errorColor }]}>
+          {t('invalidCodeAttemptsLeft', { attempts: verifyAttempts })}
+          {verifyBlockUntil && Date.now() < verifyBlockUntil && (
+            <Text>{t('tryAgainInOneHour')}</Text> // Wrap this string in a <Text> component
+          )}
         </Text>
       )}
       {isValid === true && (
-        <Text style={styles.successMessage}>Code is valid!</Text>
+        <Text style={[styles.successMessage, { color: theme.primary }]}>{t('codeValid')}</Text>
       )}
 
       <TouchableOpacity
         style={[
           styles.button,
-          (!isCodeComplete || (verifyBlockUntil && Date.now() < verifyBlockUntil)) ? styles.buttonDisabled : null
+          { backgroundColor: theme.primary },
+          (!isCodeComplete || (verifyBlockUntil && Date.now() < verifyBlockUntil)) ? styles.buttonDisabled : {}
         ]}
         onPress={handleResetPassword}
         //@ts-ignore
         disabled={!isCodeComplete || (verifyBlockUntil && Date.now() < verifyBlockUntil)}
       >
-        <Text style={styles.buttonText}>Reset Password</Text>
+        <Text style={[styles.buttonText, { color: theme.primaryForeground }]}>
+          {t('resetPassword')}
+        </Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={handleResendCode} style={styles.resendLink}>
-        <Text style={styles.resendText}>Resend Code</Text>
+        <Text style={[styles.resendText, { color: theme.blue }]}>{t('resendCode')}</Text>
       </TouchableOpacity>
       
-      <Text style={styles.attemptsText}>
-        Reset attempts left: {resetAttempts >= 0 ? resetAttempts : 0}
+      <Text style={[styles.attemptsText, { color: theme.mutedForeground }]}>
+        {t('resetAttemptsLeft', { attempts: Math.max(resetAttempts, 0) })}
       </Text>
     </View>
   );
@@ -139,19 +151,18 @@ const CodeVerificationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
   },
   title: {
+    marginTop:40,
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: 'gray',
     marginBottom: 30,
     textAlign: 'center',
   },
@@ -159,13 +170,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '80%',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   codeInput: {
     width: 40,
     height: 50,
     borderWidth: 1,
-    borderColor: 'gray',
     borderRadius: 5,
     textAlign: 'center',
     fontSize: 20,
@@ -177,25 +187,21 @@ const styles = StyleSheet.create({
     borderColor: 'green',
   },
   errorMessage: {
-    color: 'red',
     marginBottom: 20,
   },
   successMessage: {
-    color: 'green',
     marginBottom: 20,
   },
   button: {
-    marginTop: 40,
-    backgroundColor: 'black',
+    marginTop: 20,
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 5,
   },
   buttonDisabled: {
-    backgroundColor: 'gray',
+    opacity: 0.5,
   },
   buttonText: {
-    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -203,13 +209,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   resendText: {
-    color: 'blue',
+    fontSize: 16,
     textDecorationLine: 'underline',
   },
   attemptsText: {
-    fontSize: 14,
-    color: 'gray',
     marginTop: 10,
+    fontSize: 14,
   },
 });
 

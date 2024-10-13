@@ -53,7 +53,7 @@ const App: React.FC = () => {
                 <Stack.Screen 
                   name="NewPassword" 
                   component={NewPasswordScreen} 
-                  options={{ title: 'New Password' }}
+                  options={{ title: 'New Password' ,headerShown: false}}
                 />
                 <Stack.Screen 
                   name="PasswordResetSuccess" 

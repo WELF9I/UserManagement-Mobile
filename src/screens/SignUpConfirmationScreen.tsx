@@ -1,13 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next'; // Import the useTranslation hook
+import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
 
 const SignUpConfirmationScreen = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation(); // Initialize the translation hook
+  const { theme } = useTheme(); // Get the current theme
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
-        //@ts-ignore
+      //@ts-ignore
       navigation.navigate('SignIn');
     }, 5000);
 
@@ -15,17 +19,19 @@ const SignUpConfirmationScreen = () => {
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Image
         source={require('../assets/mail-envelope.png')}
         style={styles.image}
       />
-      <Text style={styles.title}>Request Sent!</Text>
-      <Text style={styles.message}>
-        Your sign-up request has been sent to the admin for approval. Please wait for confirmation.
+      <Text style={[styles.title, { color: theme.foreground }]}>
+        {t('requestSent')}
       </Text>
-      <Text style={styles.submessage}>
-        You will be redirected to the login screen shortly.
+      <Text style={[styles.message, { color: theme.foreground }]}>
+        {t('signUpRequestSent')}
+      </Text>
+      <Text style={[styles.submessage, { color: theme.mutedForeground }]}>
+        {t('redirectToLogin')}
       </Text>
     </View>
   );
@@ -36,7 +42,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f8ff',
     padding: 20,
   },
   image: {
@@ -47,19 +52,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#4a90e2',
     marginBottom: 20,
   },
   message: {
     fontSize: 18,
     textAlign: 'center',
-    color: '#333',
     marginBottom: 20,
   },
   submessage: {
     fontSize: 14,
     textAlign: 'center',
-    color: '#666',
   },
 });
 

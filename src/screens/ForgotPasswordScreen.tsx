@@ -4,6 +4,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../components/ThemeContext';
+import CustomHeader from '../components/CustomHeader';
 import { useAttempt } from '../components/AttemptContext';
 
 const forgotPasswordSchema = z.object({
@@ -18,6 +21,8 @@ const ForgotPasswordScreen = () => {
   const [submitError, setSubmitError] = useState('');
   const navigation = useNavigation();
   const { resetAttempts, resetBlockUntil, decrementResetAttempts } = useAttempt();
+  const { t } = useTranslation();
+  const { theme } = useTheme();
 
   const { control, handleSubmit, formState: { errors } } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -26,7 +31,7 @@ const ForgotPasswordScreen = () => {
   const onSubmit = async (data: ForgotPasswordFormData) => {
     if (resetBlockUntil && Date.now() < resetBlockUntil) {
       const minutesLeft = Math.ceil((resetBlockUntil - Date.now()) / (1000 * 60));
-      setSubmitError(`Please wait ${minutesLeft} minutes before requesting another code.`);
+      setSubmitError(t('pleaseWaitBeforeRequestingCode', { minutes: minutesLeft }));
       return;
     }
 
@@ -38,83 +43,91 @@ const ForgotPasswordScreen = () => {
       
       await decrementResetAttempts();
       
-      setSuccessMessage('A reset code has been sent to your email.');
+      setSuccessMessage(t('resetCodeSent'));
       
       // Navigate to Code Verification screen after a short delay
       setTimeout(() => {
         //@ts-ignore
-        navigation.navigate('CodeVerification', { email: data.email });
+        navigation.navigate('CodeVerification' as never, { email: data.email } as never);
       }, 2000);
     } catch (error) {
       console.error('Forgot password error:', error);
-      setSubmitError('An error occurred. Please try again.');
+      setSubmitError(t('errorOccurred'));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Forgot Password</Text>
-      
-      {successMessage ? (
-        <View style={styles.successMessage}>
-          <Text style={styles.successMessageText}>{successMessage}</Text>
-        </View>
-      ) : null}
-
-      <View style={styles.form}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={styles.input}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            )}
-          />
-          {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
-        </View>
-
-        {submitError ? (
-          <View style={styles.errorMessage}>
-            <Text style={styles.errorMessageText}>{submitError}</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <CustomHeader title={t('forgotPassword')} />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={[styles.title, { color: theme.foreground }]}>{t('forgotPassword')}</Text>
+        
+        {successMessage ? (
+          <View style={styles.successMessage}>
+            <Text style={styles.successMessageText}>{successMessage}</Text>
           </View>
         ) : null}
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleSubmit(onSubmit)}
-          //@ts-ignore
-          disabled={isLoading || (resetBlockUntil && Date.now() < resetBlockUntil)}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.buttonText}>Send Reset Code</Text>
-          )}
-        </TouchableOpacity>
+        <View style={styles.form}>
+          <View style={styles.inputContainer}>
+            <Text style={[styles.label, { color: theme.foreground }]}>{t('email')}</Text>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholder={t('emailPlaceholder')}
+                  placeholderTextColor={theme.mutedForeground}
+                />
+              )}
+            />
+            {errors.email && <Text style={[styles.errorText, { color: theme.errorColor }]}>{errors.email.message}</Text>}
+          </View>
 
-        <Text style={styles.attemptsText}>
-          Reset attempts left: {Math.max(resetAttempts, 0)}
-        </Text>
-      </View>
-    </ScrollView>
+          {submitError ? (
+            <View style={styles.errorMessage}>
+              <Text style={[styles.errorMessageText, { color: theme.errorColor }]}>{submitError}</Text>
+            </View>
+          ) : null}
+
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: theme.primary }]}
+            onPress={handleSubmit(onSubmit)}
+            //@ts-ignore
+            disabled={isLoading || (resetBlockUntil && Date.now() < resetBlockUntil)}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={theme.primaryForeground} />
+            ) : (
+              <Text style={[styles.buttonText, { color: theme.primaryForeground }]}>{t('sendResetCode')}</Text>
+            )}
+          </TouchableOpacity>
+
+          <Text style={[styles.attemptsText, { color: theme.mutedForeground }]}>
+            {t('resetAttemptsLeft', { attempts: Math.max(resetAttempts, 0) })}
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: 'white',
   },
   title: {
     fontSize: 24,
@@ -134,23 +147,19 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
     borderRadius: 4,
     padding: 8,
   },
   errorText: {
-    color: 'red',
     fontSize: 12,
     marginTop: 4,
   },
   button: {
-    backgroundColor: 'black',
     borderRadius: 4,
     padding: 12,
     marginTop: 16,
   },
   buttonText: {
-    color: 'white',
     textAlign: 'center',
     fontWeight: '600',
   },
@@ -179,7 +188,6 @@ const styles = StyleSheet.create({
   attemptsText: {
     textAlign: 'center',
     marginTop: 10,
-    color: 'gray',
   },
 });
 

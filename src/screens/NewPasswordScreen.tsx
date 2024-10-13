@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../components/ThemeContext';
+import CustomHeader from '../components/CustomHeader';
 
 const NewPasswordScreen = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -9,8 +12,9 @@ const NewPasswordScreen = () => {
   const [passwordsMatch, setPasswordsMatch] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
-  //@ts-ignore
-  const { email } = route.params;
+  const { email } = route.params as { email: string };
+  const { t } = useTranslation();
+  const { theme } = useTheme();
 
   useEffect(() => {
     setPasswordLengthValid(newPassword.length >= 8);
@@ -20,58 +24,74 @@ const NewPasswordScreen = () => {
   const isPasswordValid = passwordLengthValid && passwordsMatch;
 
   const handleConfirm = () => {
-    //@ts-ignore
-    navigation.navigate('PasswordResetSuccess');
+    navigation.navigate('PasswordResetSuccess' as never);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Set New Password</Text>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>New Password</Text>
-        <TextInput
-          style={[
-            styles.input,
-            newPassword !== '' && (passwordLengthValid ? styles.validInput : styles.invalidInput)
-          ]}
-          secureTextEntry
-          value={newPassword}
-          onChangeText={setNewPassword}
-          placeholder="Enter new password"
-        />
-        {newPassword !== '' && (
-          <Text style={passwordLengthValid ? styles.validMessage : styles.errorMessage}>
-            {passwordLengthValid ? 'Password length is valid' : 'Password must be at least 8 characters'}
-          </Text>
-        )}
-      </View>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <CustomHeader title={t('setNewPassword')} />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={[styles.title, { color: theme.foreground }]}>{t('setNewPassword')}</Text>
+        <View style={styles.inputContainer}>
+          <Text style={[styles.label, { color: theme.foreground }]}>{t('newPassword')}</Text>
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: theme.border, color: theme.foreground },
+              newPassword !== '' && (passwordLengthValid ? styles.validInput : styles.invalidInput)
+            ]}
+            secureTextEntry
+            value={newPassword}
+            onChangeText={setNewPassword}
+            placeholder={t('enterNewPassword')}
+            placeholderTextColor={theme.mutedForeground}
+          />
+          {newPassword !== '' && (
+            <Text style={[
+              passwordLengthValid ? styles.validMessage : styles.errorMessage,
+              { color: passwordLengthValid ? theme.primary : theme.errorColor }
+            ]}>
+              {passwordLengthValid ? t('passwordLengthValid') : t('passwordMustBeAtLeast')}
+            </Text>
+          )}
+        </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Confirm Password</Text>
-        <TextInput
-          style={[
-            styles.input,
-            confirmPassword !== '' && (passwordsMatch ? styles.validInput : styles.invalidInput)
-          ]}
-          secureTextEntry
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          placeholder="Confirm new password"
-        />
-        {confirmPassword !== '' && (
-          <Text style={passwordsMatch ? styles.validMessage : styles.errorMessage}>
-            {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
-          </Text>
-        )}
-      </View>
+        <View style={styles.inputContainer}>
+          <Text style={[styles.label, { color: theme.foreground }]}>{t('confirmPassword')}</Text>
+          <TextInput
+            style={[
+              styles.input,
+              { borderColor: theme.border, color: theme.foreground },
+              confirmPassword !== '' && (passwordsMatch ? styles.validInput : styles.invalidInput)
+            ]}
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            placeholder={t('confirmNewPassword')}
+            placeholderTextColor={theme.mutedForeground}
+          />
+          {confirmPassword !== '' && (
+            <Text style={[
+              passwordsMatch ? styles.validMessage : styles.errorMessage,
+              { color: passwordsMatch ? theme.primary : theme.errorColor }
+            ]}>
+              {passwordsMatch ? t('passwordsMatch') : t('passwordsDontMatch')}
+            </Text>
+          )}
+        </View>
 
-      <TouchableOpacity
-        style={[styles.button, !isPasswordValid && styles.buttonDisabled]}
-        onPress={handleConfirm}
-        disabled={!isPasswordValid}
-      >
-        <Text style={styles.buttonText}>Confirm</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: theme.primary },
+            !isPasswordValid && styles.buttonDisabled
+          ]}
+          onPress={handleConfirm}
+          disabled={!isPasswordValid}
+        >
+          <Text style={[styles.buttonText, { color: theme.primaryForeground }]}>{t('confirm')}</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 };
@@ -79,10 +99,13 @@ const NewPasswordScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
   },
   title: {
     fontSize: 24,
@@ -100,7 +123,6 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1.2,
-    borderColor: '#d1d5db',
     borderRadius: 4,
     padding: 10,
     fontSize: 16,
@@ -113,7 +135,6 @@ const styles = StyleSheet.create({
     borderColor: 'red',
   },
   button: {
-    backgroundColor: 'black',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 5,
@@ -121,20 +142,17 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonDisabled: {
-    backgroundColor: 'gray',
+    opacity: 0.5,
   },
   buttonText: {
-    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },
   errorMessage: {
-    color: 'red',
     fontSize: 14,
     marginTop: 5,
   },
   validMessage: {
-    color: 'green',
     fontSize: 14,
     marginTop: 5,
   },
