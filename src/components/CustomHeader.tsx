@@ -1,29 +1,25 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { useTranslation } from 'react-i18next';
+import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from './ThemeContext';
 import ThemeToggleButton from './ThemeToggleButton';
-import { useTheme } from '../components/ThemeContext';
+import LanguageSelector from './LanguageSelector';
 
 interface CustomHeaderProps {
   title: string;
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({ title }) => {
-  const { t, i18n } = useTranslation();
   const { theme } = useTheme();
-
-  const toggleLanguage = () => {
-    i18n.changeLanguage(i18n.language === 'en' ? 'fr' : 'en');
-  };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <TouchableOpacity onPress={toggleLanguage} style={styles.languageButton}>
-        <Text style={[styles.languageButtonText, { color: theme.foreground }]}>
-          {i18n.language === 'en' ? 'FR' : 'EN'}
-        </Text>
-      </TouchableOpacity>
-      <ThemeToggleButton />
+      <View style={styles.left}>
+        <LanguageSelector />
+      </View>
+
+      <View style={styles.right}>
+        <ThemeToggleButton />
+      </View>
     </View>
   );
 };
@@ -37,16 +33,17 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
   },
-  languageButton: {
-    padding: 8,
+  left: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  languageButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+
+  right: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
 });
 

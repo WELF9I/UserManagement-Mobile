@@ -1,10 +1,19 @@
 {
     "signIn": "Se connecter",
+    "signInSuccessful": "Connexion réussie!",
+    "invalidCredentials": "Email ou mot de passe incorrect. Veuillez réessayer.",
     "email": "Email",
-    "password": "Mot de passe",
-    "forgotPassword": "Mot de passe oublié ?",
-    "noAccount": "Vous n'avez pas de compte ? Inscrivez-vous",
     "emailPlaceholder": "Entrez votre email",
-    "passwordPlaceholder": "Entrez votre mot de passe"
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "forgotPassword": "Mot de passe oublié?",
+    "noAccount": "Vous n'avez pas de compte ? Inscrivez-vous",
+    "signUp": "S'inscrire",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Entrez votre prénom",
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Entrez votre nom",
+    "passwordMustBeAtLeast": "Le mot de passe doit contenir au moins 8 caractères",
+    "alreadyHaveAccount": "Vous avez déjà un compte ? Se connecter"
   }
   

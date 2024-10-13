@@ -1,11 +1,19 @@
 {
     "signIn": "Sign In",
+    "signInSuccessful": "Sign in successful!",
+    "invalidCredentials": "Invalid email or password. Please try again.",
     "email": "Email",
+    "emailPlaceholder": "Enter your email",
     "password": "Password",
+    "passwordPlaceholder": "Enter your password",
     "forgotPassword": "Forgot Password?",
     "noAccount": "Don't have an account? Sign Up",
-    "emailPlaceholder": "Enter your email",
-    "passwordPlaceholder": "Enter your password",
-    "signInSuccessful": "Sign in successful!",
-    "invalidCredentials": "Invalid email or password. Please try again."
+    "signUp": "Sign Up",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Enter your first name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter your last name",
+    "passwordMustBeAtLeast": "Password must be at least 8 characters long",
+    "alreadyHaveAccount": "Already have an account? Sign In"
   }
+  

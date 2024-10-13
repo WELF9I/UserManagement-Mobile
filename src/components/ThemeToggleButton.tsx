@@ -1,20 +1,38 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from './ThemeContext';
+import { Sun, Moon } from 'lucide-react-native';
+
 
 const ThemeToggleButton: React.FC = () => {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme, theme } = useTheme();
 
   return (
     <TouchableOpacity
       onPress={toggleTheme}
-      className={`p-2 rounded-full ${isDark ? 'bg-white' : 'bg-black'}`}
+      style={[
+        styles.button,
+        { backgroundColor: isDark ? theme.background : theme.foreground }
+      ]}
     >
-      <Text className={`text-sm ${isDark ? 'text-black' : 'text-white'}`}>
-        {isDark ? '☀️' : '🌙'}
-      </Text>
+      {isDark ? (
+        <Sun size={20} color={theme.foreground} />
+      ) : (
+        <Moon size={20} color={theme.background} />
+      )}
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    padding: 8,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    height: 40,
+  },
+});
 
 export default ThemeToggleButton;

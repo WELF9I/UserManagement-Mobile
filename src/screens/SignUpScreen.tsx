@@ -4,8 +4,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../components/ThemeContext';
-import ThemeToggleButton from '../components/ThemeToggleButton';
+import CustomHeader from '../components/CustomHeader';
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, 'First Name is required'),
@@ -20,8 +21,8 @@ const SignUpScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const [successMessage, setSuccessMessage] = useState('');
-  const { theme, isDark } = useTheme();
-
+  const { theme } = useTheme();
+  const { t } = useTranslation();
   const { control, handleSubmit, formState: { errors } } = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
   });
@@ -42,147 +43,161 @@ const SignUpScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}>
-      <View style={styles.themeToggleContainer}>
-        <ThemeToggleButton />
-      </View>
-      <Text style={[styles.title, { color: theme.foreground }]}>Sign Up</Text>
-      
-      {successMessage ? (
-        <View style={[styles.successMessage, { backgroundColor: theme.accent, borderColor: theme.accentForeground }]}>
-          <Text style={{ color: theme.accentForeground }}>{successMessage}</Text>
-        </View>
-      ) : null}
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <CustomHeader title={t('signUp')} />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={[styles.title, { color: theme.foreground }]}>{t('signUp')}</Text>
+        
+        {successMessage ? (
+          <View style={[styles.successMessage, { backgroundColor: theme.accent, borderColor: theme.accentForeground }]}>
+            <Text style={{ color: theme.accentForeground }}>{successMessage}</Text>
+          </View>
+        ) : null}
 
       <View style={styles.form}>
-        <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: theme.foreground }]}>First Name</Text>
-          <Controller
-            control={control}
-            name="firstName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                placeholder="First Name"
-                placeholderTextColor={theme.mutedForeground}
-              />
+          <View style={styles.inputContainer}>
+            <Text style={[styles.label, { color: theme.foreground }]}>{t('firstName')}</Text>
+            <Controller
+              control={control}
+              name="firstName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder={t('firstNamePlaceholder')}
+                  placeholderTextColor={theme.mutedForeground}
+                />
+              )}
+            />
+            {errors.firstName && (
+              <Text style={[styles.errorText, { color: theme.errorColor }]}>
+                {t(errors.firstName?.message ?? 'firstNameError')}
+              </Text>
             )}
-          />
-          {errors.firstName && <Text style={[styles.errorText, { color: theme.errorColor }]}>{errors.firstName.message}</Text>}
-        </View>
+          </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: theme.foreground }]}>Last Name</Text>
-          <Controller
-            control={control}
-            name="lastName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                placeholder="Last Name"
-                placeholderTextColor={theme.mutedForeground}
-              />
+          <View style={styles.inputContainer}>
+            <Text style={[styles.label, { color: theme.foreground }]}>{t('lastName')}</Text>
+            <Controller
+              control={control}
+              name="lastName"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder={t('lastNamePlaceholder')}
+                  placeholderTextColor={theme.mutedForeground}
+                />
+              )}
+            />
+            {errors.lastName && (
+              <Text style={[styles.errorText, { color: theme.errorColor }]}>
+                {t(errors.lastName?.message ?? 'lastNameError')}
+              </Text>
             )}
-          />
-          {errors.lastName && <Text style={[styles.errorText, { color: theme.errorColor }]}>{errors.lastName.message}</Text>}
-        </View>
+          </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: theme.foreground }]}>Email</Text>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholder="Email"
-                placeholderTextColor={theme.mutedForeground}
-              />
+          <View style={styles.inputContainer}>
+            <Text style={[styles.label, { color: theme.foreground }]}>{t('email')}</Text>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholder={t('emailPlaceholder')}
+                  placeholderTextColor={theme.mutedForeground}
+                />
+              )}
+            />
+            {errors.email && (
+              <Text style={[styles.errorText, { color: theme.errorColor }]}>
+                {t(errors.email?.message ?? 'emailError')}
+              </Text>
             )}
-          />
-          {errors.email && <Text style={[styles.errorText, { color: theme.errorColor }]}>{errors.email.message}</Text>}
-        </View>
+          </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={[styles.label, { color: theme.foreground }]}>Password</Text>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                secureTextEntry
-                placeholder="Password"
-                placeholderTextColor={theme.mutedForeground}
-              />
+          <View style={styles.inputContainer}>
+            <Text style={[styles.label, { color: theme.foreground }]}>{t('password')}</Text>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  secureTextEntry
+                  placeholder={t('passwordPlaceholder')}
+                  placeholderTextColor={theme.mutedForeground}
+                />
+              )}
+            />
+            {errors.password && (
+              <Text style={[styles.errorText, { color: theme.errorColor }]}>
+                {t(errors.password?.message ?? 'passwordError')}
+              </Text>
             )}
-          />
-          {errors.password && <Text style={[styles.errorText, { color: theme.errorColor }]}>{errors.password.message}</Text>}
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: theme.primary }]}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={theme.primaryForeground} />
+            ) : (
+              <Text style={[styles.buttonText, { color: theme.primaryForeground }]}>{t('signUp')}</Text>
+            )}
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: theme.primary }]}
-          onPress={handleSubmit(onSubmit)}
-          disabled={isLoading}
+          style={styles.linkButton}
+          onPress={() => navigation.navigate('SignIn' as never)}
         >
-          {isLoading ? (
-            <ActivityIndicator color={theme.primaryForeground} />
-          ) : (
-            <Text style={[styles.buttonText, { color: theme.primaryForeground }]}>Sign Up</Text>
-          )}
+          <Text style={[styles.linkText, { color: theme.blue }]}>{t('alreadyHaveAccount')}</Text>
         </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        style={styles.linkButton}
-        onPress={() => navigation.navigate('SignIn' as never)}
-      >
-        <Text style={[styles.linkText, { color: theme.blue }]}>Already have an account? Sign In</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 20,
-  },
-  themeToggleContainer: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
+    padding: 24,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 24,
     textAlign: 'center',
   },
   form: {
-    gap: 20,
+    gap: 16,
   },
   inputContainer: {
-    marginBottom: 10,
+    marginBottom: 16,
   },
   label: {
     fontWeight: '500',
-    marginBottom: 5,
+    marginBottom: 4,
   },
   input: {
     borderWidth: 1,
@@ -192,20 +207,20 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    marginTop: 5,
+    marginTop: 4,
   },
   button: {
     padding: 15,
     borderRadius: 4,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 16,
   },
   buttonText: {
     fontWeight: 'bold',
     fontSize: 16,
   },
   linkButton: {
-    marginTop: 15,
+    marginTop: 16,
     alignItems: 'center',
   },
   linkText: {
