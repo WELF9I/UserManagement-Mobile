@@ -1,0 +1,11 @@
+{
+    "signIn": "Sign In",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account? Sign Up",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "signInSuccessful": "Sign in successful!",
+    "invalidCredentials": "Invalid email or password. Please try again."
+  }
