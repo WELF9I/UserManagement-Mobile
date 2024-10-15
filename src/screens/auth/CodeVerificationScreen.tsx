@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useAttempt } from '../components/AttemptContext';
+import { useAttempt } from '../../components/AttemptContext';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../components/ThemeContext';
-import CustomHeader from '../components/CustomHeader';
+import { useTheme } from '../../components/theme/ThemeContext';
+import CustomHeader from '../../components/CustomHeader';
+import { authService } from '../../services/authService';
+
 
 const CodeVerificationScreen = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);

@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTranslation } from 'react-i18next'; // Import the useTranslation hook
-import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
+import { useTranslation } from 'react-i18next'; 
+import { useTheme } from '../../components/theme/ThemeContext'; 
+import { authService } from '../../services/authService';
 
 const PasswordResetSuccessScreen = () => {
   const navigation = useNavigation();
-  const { t } = useTranslation(); // Initialize the translation hook
-  const { theme } = useTheme(); // Get the current theme
+  const { t } = useTranslation(); 
+  const { theme } = useTheme(); 
 
   const handleGoToSignIn = () => {
     //@ts-ignore
@@ -22,7 +23,7 @@ const PasswordResetSuccessScreen = () => {
         </Text>
         <View style={styles.checkMarkContainer}>
           <Image
-            source={require('../assets/check-mark.png')}
+            source={require('../../assets/check-mark.png')}
             style={styles.checkMarkImage}
           />
         </View>

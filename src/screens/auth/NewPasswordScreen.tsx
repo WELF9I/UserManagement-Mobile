@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../components/ThemeContext';
-import CustomHeader from '../components/CustomHeader';
+import { useTheme } from '../../components/theme/ThemeContext';
+import CustomHeader from '../../components/CustomHeader';
+import { authService } from '../../services/authService';
 
 const NewPasswordScreen = () => {
   const [newPassword, setNewPassword] = useState('');

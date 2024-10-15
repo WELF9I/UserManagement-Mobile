@@ -5,54 +5,41 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../components/ThemeContext';
-import CustomHeader from '../components/CustomHeader';
-import { useAttempt } from '../components/AttemptContext';
+import { useTheme } from '../../components/theme/ThemeContext';
+import CustomHeader from '../../components/CustomHeader';
+import { authService } from '../../services/authService';
+import { SignInData } from '../../models/User';
 
-const forgotPasswordSchema = z.object({
+const signInSchema = z.object({
   email: z.string().email('Email is invalid'),
+  password: z.string().min(1, 'Password is required'),
 });
 
-type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+type SignInFormData = z.infer<typeof signInSchema>;
 
-const ForgotPasswordScreen = () => {
+const SignInScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
   const navigation = useNavigation();
-  const { resetAttempts, resetBlockUntil, decrementResetAttempts } = useAttempt();
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  const { control, handleSubmit, formState: { errors } } = useForm<ForgotPasswordFormData>({
-    resolver: zodResolver(forgotPasswordSchema),
+  const { control, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
   });
 
-  const onSubmit = async (data: ForgotPasswordFormData) => {
-    if (resetBlockUntil && Date.now() < resetBlockUntil) {
-      const minutesLeft = Math.ceil((resetBlockUntil - Date.now()) / (1000 * 60));
-      setSubmitError(t('pleaseWaitBeforeRequestingCode', { minutes: minutesLeft }));
-      return;
-    }
-
+  const onSubmit = async (data: SignInFormData) => {
     setIsLoading(true);
     setSubmitError('');
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      await decrementResetAttempts();
-      
-      setSuccessMessage(t('resetCodeSent'));
-      
-      // Navigate to Code Verification screen after a short delay
-      setTimeout(() => {
-        //@ts-ignore
-        navigation.navigate('CodeVerification' as never, { email: data.email } as never);
-      }, 2000);
+      const response = await authService.signIn(data);
+      setSuccessMessage(t('signInSuccessful'));
+      console.log('Sign in successful:', response);
+      // Handle successful sign in (e.g., store token, navigate to main screen)
     } catch (error) {
-      console.error('Forgot password error:', error);
-      setSubmitError(t('errorOccurred'));
+      console.error('Sign in error:', error);
+      setSubmitError(t('invalidCredentials'));
     } finally {
       setIsLoading(false);
     }
@@ -60,9 +47,9 @@ const ForgotPasswordScreen = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <CustomHeader title={t('forgotPassword')} />
+      <CustomHeader title={t('signIn')} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={[styles.title, { color: theme.foreground }]}>{t('forgotPassword')}</Text>
+        <Text style={[styles.title, { color: theme.foreground }]}>{t('signIn')}</Text>
         
         {successMessage ? (
           <View style={styles.successMessage}>
@@ -89,32 +76,61 @@ const ForgotPasswordScreen = () => {
                 />
               )}
             />
-            {errors.email && <Text style={[styles.errorText, { color: theme.errorColor }]}>{errors.email.message}</Text>}
+             {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={[styles.label, { color: theme.foreground }]}>{t('password')}</Text>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, { borderColor: theme.border, color: theme.foreground }]}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  secureTextEntry
+                  placeholder={t('passwordPlaceholder')}
+                  placeholderTextColor={theme.mutedForeground}
+                />
+              )}
+            />
+             {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
           </View>
 
           {submitError ? (
             <View style={styles.errorMessage}>
-              <Text style={[styles.errorMessageText, { color: theme.errorColor }]}>{submitError}</Text>
+              <Text style={styles.errorMessageText}>{submitError}</Text>
             </View>
           ) : null}
 
           <TouchableOpacity
             style={[styles.button, { backgroundColor: theme.primary }]}
             onPress={handleSubmit(onSubmit)}
-            //@ts-ignore
-            disabled={isLoading || (resetBlockUntil && Date.now() < resetBlockUntil)}
+            disabled={isLoading}
           >
             {isLoading ? (
               <ActivityIndicator color={theme.primaryForeground} />
             ) : (
-              <Text style={[styles.buttonText, { color: theme.primaryForeground }]}>{t('sendResetCode')}</Text>
+              <Text style={[styles.buttonText, { color: theme.primaryForeground }]}>{t('signIn')}</Text>
             )}
           </TouchableOpacity>
-
-          <Text style={[styles.attemptsText, { color: theme.mutedForeground }]}>
-            {t('resetAttemptsLeft', { attempts: Math.max(resetAttempts, 0) })}
-          </Text>
         </View>
+
+        <TouchableOpacity
+          style={styles.forgotPassword}
+          onPress={() => navigation.navigate('ForgotPassword' as never)}
+        >
+          <Text style={[styles.forgotPasswordText, { color: theme.blue }]}>{t('forgotPassword')}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.signUpLink}
+          onPress={() => navigation.navigate('SignUp' as never)}
+        >
+          <Text style={[styles.signUpText, { color: theme.blue }]}>{t('noAccount')}</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -151,6 +167,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   errorText: {
+    color: 'red',
     fontSize: 12,
     marginTop: 4,
   },
@@ -185,10 +202,18 @@ const styles = StyleSheet.create({
   errorMessageText: {
     color: '#721c24',
   },
-  attemptsText: {
+  forgotPassword: {
+    marginTop: 16,
+  },
+  forgotPasswordText: {
     textAlign: 'center',
-    marginTop: 10,
+  },
+  signUpLink: {
+    marginTop: 16,
+  },
+  signUpText: {
+    textAlign: 'center',
   },
 });
 
-export default ForgotPasswordScreen;
+export default SignInScreen;

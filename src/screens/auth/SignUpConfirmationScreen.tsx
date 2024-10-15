@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useTranslation } from 'react-i18next'; // Import the useTranslation hook
-import { useTheme } from '../components/ThemeContext'; // Import the useTheme hook
-
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../components/theme/ThemeContext'; 
+import { authService } from '../../services/authService';
 const SignUpConfirmationScreen = () => {
   const navigation = useNavigation();
-  const { t } = useTranslation(); // Initialize the translation hook
-  const { theme } = useTheme(); // Get the current theme
+  const { t } = useTranslation(); 
+  const { theme } = useTheme(); 
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -21,7 +21,7 @@ const SignUpConfirmationScreen = () => {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Image
-        source={require('../assets/mail-envelope.png')}
+        source={require('../../assets/mail-envelope.png')}
         style={styles.image}
       />
       <Text style={[styles.title, { color: theme.foreground }]}>

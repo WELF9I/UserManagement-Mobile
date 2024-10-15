@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useTheme } from './ThemeContext';
-import ThemeToggleButton from './ThemeToggleButton';
+import { useTheme } from './theme/ThemeContext';
+import ThemeToggleButton from './theme/ThemeToggleButton';
 import LanguageSelector from './LanguageSelector';
 
 interface CustomHeaderProps {

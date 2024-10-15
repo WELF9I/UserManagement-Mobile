@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, StyleSheet, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from './ThemeContext';
+import { useTheme } from './theme/ThemeContext';
 import { ChevronDown } from 'lucide-react-native';
 
 const languages = [

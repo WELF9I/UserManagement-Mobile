@@ -5,8 +5,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../components/ThemeContext';
-import CustomHeader from '../components/CustomHeader';
+import { useTheme } from '../../components/theme/ThemeContext';
+import CustomHeader from '../../components/CustomHeader';
+import { authService } from '../../services/authService';
+import { SignUpData } from '../../models/User';
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, 'First Name is required'),
@@ -30,17 +32,24 @@ const SignUpScreen = () => {
   const onSubmit = async (data: SignUpFormData) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const signUpData: SignUpData = {
+        ...data,
+        role: 'user', 
+        status: 'pending',
+        registrationDate: new Date(),
+      };
+  
+      const response = await authService.signUp(signUpData);
       navigation.navigate('SignUpConfirmation' as never);
-      console.log('Form data:', data);
+      console.log('Sign up successful:', response);
     } catch (error) {
       console.error('Sign up error:', error);
+      // Optionally handle the error (e.g., show an error message to the user)
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
