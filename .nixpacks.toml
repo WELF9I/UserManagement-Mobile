@@ -6,3 +6,6 @@ commands = ["npm install"]
 
 [phases.start]
 commands = ["npm start"]
+
+[languages]
+nodejs = true
