@@ -1,0 +1,8 @@
+[phases.setup]
+commands = ["corepack enable"]
+
+[phases.install]
+commands = ["yarn install"]
+
+[phases.start]
+commands = ["yarn start"]
