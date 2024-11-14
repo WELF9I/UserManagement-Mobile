@@ -2,7 +2,7 @@
 commands = ["corepack enable"]
 
 [phases.install]
-commands = ["yarn install"]
+commands = ["npm install"]
 
 [phases.start]
-commands = ["yarn start"]
+commands = ["npm start"]
