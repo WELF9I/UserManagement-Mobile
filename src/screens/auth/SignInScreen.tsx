@@ -30,19 +30,7 @@ const SignInScreen = () => {
   });
 
   const onSubmit = async (data: SignInFormData) => {
-    setIsLoading(true);
-    setSubmitError('');
-    try {
-      const response = await authService.signIn(data);
-      setSuccessMessage(t('signInSuccessful'));
-      console.log('Sign in successful:', response);
-      // Handle successful sign in (e.g., store token, navigate to main screen)
-    } catch (error) {
-      console.error('Sign in error:', error);
-      setSubmitError(t('invalidCredentials'));
-    } finally {
-      setIsLoading(false);
-    }
+    navigation.navigate('Dashboard' as never);
   };
 
   return (

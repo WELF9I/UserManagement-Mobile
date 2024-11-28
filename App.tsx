@@ -14,11 +14,14 @@ import { ThemeProvider } from './src/components/theme/ThemeContext';
 import { TailwindProvider } from 'tailwindcss-react-native';
 import i18n from './i18n';
 import { I18nextProvider } from 'react-i18next';
+import DashboardScreen from './src/screens/dashboard/DashboardScreen';
+import { Provider as PaperProvider } from 'react-native-paper';
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
   return (
     <I18nextProvider i18n={i18n}>
+      <PaperProvider>
     <TailwindProvider>
       <ThemeProvider>
         <AttemptProvider>
@@ -60,14 +63,21 @@ const App: React.FC = () => {
                   component={PasswordResetSuccessScreen} 
                   options={{ title: 'Password Reset', headerShown: false }}
                 />
+                <Stack.Screen 
+                    name="Dashboard" 
+                    component={DashboardScreen} 
+                    options={{ headerShown: false }}
+                  />
               </Stack.Navigator>
             </NavigationContainer>
           </SafeAreaProvider>
         </AttemptProvider>
       </ThemeProvider>
     </TailwindProvider>
+    </PaperProvider>
     </I18nextProvider>
   );
 };
 
 export default App;
+
