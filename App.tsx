@@ -16,6 +16,7 @@ import i18n from './i18n';
 import { I18nextProvider } from 'react-i18next';
 import DashboardScreen from './src/screens/dashboard/DashboardScreen';
 import { Provider as PaperProvider } from 'react-native-paper';
+import UpdateProfileScreen from './src/screens/dashboard/UpdateProfileScreen';
 const Stack = createNativeStackNavigator();
 
 const App: React.FC = () => {
@@ -66,6 +67,11 @@ const App: React.FC = () => {
                 <Stack.Screen 
                     name="Dashboard" 
                     component={DashboardScreen} 
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen 
+                    name="UpdateProfile" 
+                    component={UpdateProfileScreen} 
                     options={{ headerShown: false }}
                   />
               </Stack.Navigator>

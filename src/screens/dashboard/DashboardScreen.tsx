@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import {View,ScrollView,StyleSheet,RefreshControl,
-} from 'react-native';
-import {Text,Portal,Modal,Button,Searchbar,Appbar,DataTable,Chip,SegmentedButtons,Card,IconButton,Menu,Divider,TextInput,Checkbox,
-} from 'react-native-paper';
+import { View, ScrollView, StyleSheet, RefreshControl } from 'react-native';
+import { Text, Portal, Modal, Button, Searchbar, Appbar, DataTable, Chip, SegmentedButtons, Card, IconButton, Menu, Divider, TextInput, Checkbox } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Users, Bell, Settings, BarChart, MoreVertical, Edit, Ban, Trash2,Search,FileDown,UserPlus,
-} from 'lucide-react-native';
+import { Users, Bell, Settings, BarChart, MoreVertical, Edit, Ban, Trash2, Search, FileDown, UserPlus } from 'lucide-react-native';
 import { mockUsers, mockNotifications, mockLogs, mockContent } from './mockData';
 import { User } from '../../types/dashboard';
+import { useNavigation } from '@react-navigation/native';
 
 export default function DashboardScreen() {
+  const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState('users');
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
@@ -169,7 +168,7 @@ export default function DashboardScreen() {
       <Appbar.Header style={styles.header}>
         <Appbar.Content title="Admin Dashboard" />
         <Appbar.Action icon={() => <Bell size={24} color="#000" />} onPress={() => {}} />
-        <Appbar.Action icon={() => <Settings size={24} color="#000" />} onPress={() => {}} />
+        <Appbar.Action icon={() => <Settings size={24} color="#000" />} onPress={() => navigation.navigate('UpdateProfile' as never)} />
       </Appbar.Header>
 
       <SegmentedButtons
